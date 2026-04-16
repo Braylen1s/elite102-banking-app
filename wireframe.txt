@@ -1,0 +1,63 @@
+=============================
+      BANKING SYSTEM
+=============================
+
+MAIN MENU (Terminal UI)
+
+1. Create Account
+2. View Accounts
+3. Deposit Money
+4. Withdraw Money
+5. Exit
+
+-----------------------------
+
+CREATE ACCOUNT SCREEN
+-----------------------------
+Enter name: __________
+Enter starting balance: ________
+[System saves to database]
+→ Return to MAIN MENU
+
+-----------------------------
+
+VIEW ACCOUNTS SCREEN
+-----------------------------
+Display all accounts from database:
+
+ID: 1 | Name: ___ | Balance: ___
+ID: 2 | Name: ___ | Balance: ___
+
+→ Return to MAIN MENU
+
+-----------------------------
+
+DEPOSIT SCREEN
+-----------------------------
+Show all accounts
+Select Account ID: ____
+Enter deposit amount: ____
+
+→ Return to MAIN MENU
+
+-----------------------------
+
+WITHDRAW SCREEN
+-----------------------------
+Show all accounts
+Select Account ID: ____
+Enter withdraw amount: ____
+
+IF balance OK:
+    subtract money
+ELSE:
+    show "Not enough balance"
+
+→ Return to MAIN MENU
+
+-----------------------------
+
+EXIT SCREEN
+-----------------------------
+"Goodbye!"
+Program closes
