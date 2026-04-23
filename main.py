@@ -16,34 +16,72 @@ CREATE TABLE IF NOT EXISTS accounts (
 conn.commit()
 
 # -----------------
-# Functions
+# FUNCTIONS
 # -----------------
 
 def create_account():
-    name = input("Enter your name:")
-    balance = float(input("Enter balance: "))
+    name = input("Enter your name: ")
+
+    try:
+        balance = float(input("Enter balance: "))
+    except ValueError:
+        print("Invalid balance\n")
+        return
+
+    if balance < 0:
+        print("Balance cannot be negative\n")
+        return
 
     cursor.execute(
         "INSERT INTO accounts (name, balance) VALUES (?, ?)",
         (name, balance)
     )
     conn.commit()
-    print("Account Created")
+    print("Account Created\n")
+
 
 def view_accounts():
     cursor.execute("SELECT id, name, balance FROM accounts")
     rows = cursor.fetchall()
 
     print("\n--- ACCOUNTS ---")
+    if not rows:
+        print("No accounts found\n")
+        return
+
     for row in rows:
         print(f"ID: {row[0]} | Name: {row[1]} | Balance: ${row[2]}")
 
     print()
 
+
 def deposit():
     view_accounts()
-    acc_id = int(input("Enter Account ID: "))
-    amount = float(input("Deposit amount: "))
+
+    try:
+        acc_id = int(input("Enter Account ID: "))
+    except ValueError:
+        print("Invalid input (numbers only)\n")
+        return
+
+    # CHECK ACCOUNT FIRST
+    cursor.execute("SELECT balance FROM accounts WHERE id = ?", (acc_id,))
+    result = cursor.fetchone()
+
+    if not result:
+        print("Invalid account ID\n")
+        return
+
+    # ONLY ASK FOR AMOUNT IF ID IS VALID
+    try:
+        amount = float(input("Deposit amount: "))
+    except ValueError:
+        print("Invalid amount (numbers only)\n")
+        return
+
+    if amount <= 0:
+        print("Invalid amount\n")
+        return
 
     cursor.execute(
         "UPDATE accounts SET balance = balance + ? WHERE id = ?",
@@ -52,35 +90,45 @@ def deposit():
     conn.commit()
 
     print("Deposit successful!\n")
-
 def withdraw():
     view_accounts()
-    acc_id = int(input("Enter Account ID: "))
-    amount = float(input("Withdraw amount: "))
 
+    try:
+        acc_id = int(input("Enter Account ID: "))
+        amount = float(input("Withdraw amount: "))
+    except ValueError:
+        print("Invalid input (numbers only)\n")
+        return
+
+    if amount <= 0:
+        print("Invalid amount\n")
+        return
+
+    # CHECK FIRST
     cursor.execute("SELECT balance FROM accounts WHERE id = ?", (acc_id,))
     result = cursor.fetchone()
 
-    if result:
-        if amount <= result[0]:
-            cursor.execute(
-                "UPDATE accounts SET balance = balance - ? WHERE id = ?",
-                (amount, acc_id)
-            )
-            conn.commit()
-            print("Withdrawal successful!\n")
-        else:
-            print("Not enough balance!\n")
-    else:
-        print("Account not found!\n")
+    if not result:
+        print("Invalid account ID\n")
+        return
 
+    if amount > result[0]:
+        print("Not enough balance!\n")
+        return
 
+    cursor.execute(
+        "UPDATE accounts SET balance = balance - ? WHERE id = ?",
+        (amount, acc_id)
+    )
+    conn.commit()
 
+    print("Withdrawal successful!\n")
 
 
 # -----------------
-# Menu System
+# MENU SYSTEM
 # -----------------
+
 while True:
     print("=== BANK MENU ===")
     print("1. Create Account")
@@ -110,7 +158,5 @@ while True:
     else:
         print("Invalid option\n")
 
-# -----------------------
 # CLOSE DATABASE
-# -----------------------
 conn.close()
